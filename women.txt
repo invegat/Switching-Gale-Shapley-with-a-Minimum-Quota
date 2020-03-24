@@ -1,0 +1,10 @@
+abi: bob, fred, jon, gav, ian, abe, dan, ed, col, hal, 7
+bea: bob, abe, col, fred, gav, dan, ian, ed, jon, hal, 7
+cath: fred, bob, ed, gav, hal, col, ian, abe, dan, jon, 6
+dee: fred, jon, col, abe, ian, hal, gav, dan, bob, ed, 6
+eve: jon, hal, fred, dan, abe, gav, col, ed, ian, bob, 5
+fay: bob, abe, ed, ian, jon, dan, fred, gav, col, hal, 5
+gay: jon, gav, hal, fred, bob, abe, col, ed, dan, ian, 4
+hope: gav, jon, bob, abe, ian, dan, hal, ed, col, fred, 4
+ivy: ian, col, hal, gav, fred, bob, abe, ed, jon, dan, 3
+jan: ed, hal, gav, abe, bob, jon, col, ian, fred, dan, 3
