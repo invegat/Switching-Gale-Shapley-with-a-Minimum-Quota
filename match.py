@@ -3,21 +3,22 @@ from collections import defaultdict
 
 class Matcher:
 
-    def __init__(self, volunteers, jobs, forbidden):
+    def __init__(self, volunteers, jobs, forbidden_jobs, forbidden_volunteers):
         '''
         Constructs a Matcher instance.
 
         Takes a dict of volunteers's job preferences, `volunteers`,
         a dict of jobs's volunteer preferences, `jobs`,
-        and a dict specifying which jobs are forbidden
+        and a dict specifying which jobs are forbidden_jobs
         for each volunteer:
 
-        >>> forbidden = { 'dan': ['ann', 'eve', ... ] }
+        >>> forbidden_jobs = { 'dan': ['ann', 'eve', ... ] }
 
         '''
         self.V = volunteers
         self.J = jobs
-        self.forbidden = forbidden
+        self.forbidden_jobs = forbidden_jobs
+        self.forbidden_volunteers = forbidden_volunteers
         self.jobs = {}
         self.pairs = []
 
@@ -51,7 +52,7 @@ class Matcher:
         Test whether (v, j) is a forbidden pairing.
 
         '''
-        return j in self.forbidden.get(v, [])
+        return (j in self.forbidden_jobs.get(v, [])) or (v in self.forbidden_volunteers.get(j, []))
 
     def after(self, v, j):
         '''
@@ -109,7 +110,8 @@ class Matcher:
             i = self.V[v].index(j)
             preferred = self.V[v][:i]
             for p in preferred:
-                if p in self.forbidden.get(v, []):  # no need to worry about
+                # if p in self.forbidden_jobs.get(v, []):  # no need to worry about
+                if self.is_forbidden(v, p):
                     continue                        # forbidden Volunteer/Jobs@
                 if p not in jobs:
                     continue
