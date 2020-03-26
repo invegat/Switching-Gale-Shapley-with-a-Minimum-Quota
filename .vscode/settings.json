@@ -1,3 +1,7 @@
 {
-  "python.pythonPath": "/home/mark/.local/share/virtualenvs/ex-2-2lWoeAAe/bin/python"
+  "python.pythonPath": "/home/mark/.local/share/virtualenvs/ex-2-2lWoeAAe/bin/python",
+  "python.linting.flake8Enabled": true,
+  "python.linting.pylintEnabled": false,
+  "python.linting.pycodestyleEnabled": false,
+  "python.linting.enabled": true
 }

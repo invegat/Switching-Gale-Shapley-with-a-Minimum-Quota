@@ -1,0 +1,6 @@
+abe: abi, eve, cath, ivy, jan, dee, fay, bea, hope, gay, 3
+bob: cath, hope, abi, dee, eve, fay, bea, jan, ivy, gay, 3
+col: hope, eve, abi, dee, bea, fay, ivy, gay, cath, jan, 4
+dan: ivy, fay, dee, gay, hope, eve, jan, bea, cath, abi, 4
+ed: jan, dee, bea, cath, fay, eve, abi, ivy, hope, gay, 5
+fred: bea, abi, dee, gay, eve, ivy, cath, jan, hope, fay, 5
