@@ -61,3 +61,8 @@ def get_volunteers():
 @app.route("/quote", methods=["GET"])
 def get_random_quote():
     return jsonify(choice(quotes)._asdict())
+
+
+# @app.route("/", methods=["GET"])
+# def get_random_quote():
+#     return "Hello"

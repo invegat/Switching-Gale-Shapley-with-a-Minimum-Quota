@@ -10,6 +10,23 @@ def setup(v_, j_):
     #     line.rstrip().split(': ') for line in open('volunteers.short.txt')))
     # j_ = dict((m, prefs.split(', ')) for [m, prefs] in (
     #     line.rstrip().split(': ') for line in open('jobs.txt')))
+    volunteers = list(v_.keys())
+    jobs = list(j_.keys())
+
+    print('type v_["abe"]', type(v_['abe']), volunteers)
+    # remove any missing job names from volunteers
+
+    for v in volunteers:
+        NA = v_[v][-1]
+        v_[v] = list(filter(lambda j: j in jobs, v_[v][:-1]))
+        v_[v].append(NA)
+
+    # remove any missing volunteer names from jobs
+
+    for j in jobs:
+        NA = j_[j][-1]
+        j_[j] = list(filter(lambda v: v in volunteers, j_[j][:-1]))
+        j_[j].append(NA)
 
     J = {}
     prefs = v_[list(v_.keys())[0]]
@@ -17,14 +34,14 @@ def setup(v_, j_):
 
     # prefs = prefs_.split(', ')
     # NA = prefs[-1]
-    for p in prefs[:-1]:
+    for p in jobs:
         w__ = j_[p]
         J[Person(p, int(w__[-1]))] = w__[:-1]
 
     V = {}
     prefs = j_[list(j_.keys())[0]]
     # prefs = prefs_.split(', ')
-    for p in prefs[:-1]:
+    for p in volunteers:
         m__ = v_.get(p, ['0'])
         person = Person(p, int(m__[-1]))
         V[person] = []
@@ -54,19 +71,42 @@ def setup(v_, j_):
         # all volunteers at or over the NA index are forbidden
         forbidden_v[j] = prefs[NA:]
 
-    match = Matcher(V, J, forbidden, forbidden_v)
+    C = defaultdict(list)
+    jKeys = []
+    while len(J) >= len(V):
+        match = Matcher(V, J, forbidden, forbidden_v)
 
-    # match volunteers and jobs; returns a mapping of jobs to volunteers
-    jobs = match()
+        # match volunteers and jobs; returns a mapping of jobs to volunteers
+        matches = match()
+        if C is None:
+            C = ((value, [key]) for key, value in enumerate(matches))
+        else:
+            for key, value in enumerate(matches):
+                C[value].append(key)
+        jKeys.extend(list(matches.keys()))
 
-    assert match.is_stable(jobs)           # should be a stable matching
-    print('stable match')
-    print('jobs', jobs)
-    a = [(key.n, jobs[key].n) for key in list(jobs.keys())]
+        J = dict(filter(lamba j, v: j not in jKeys, enumerate(J))
+        assert match.is_stable(matches)           # should be a stable matching
+        print('stable match')
+    if len(J) > 0:
+        V_=sorted(C.items(), key=lambda kv: len(kv[1]))[:len(J)]
+        match=Matcher(V_, J, forbidden, forbidden_v)
+
+        # match volunteers and jobs; returns a mapping of jobs to volunteers
+        matches=match()
+        for key, value in enumerate(matches):
+            C[value].append(key)
+
+
+
+    # print('jobs', jobs)
+    a=[(key.n, [j.n for j in C[key]) for key in list(C.keys())]
+
+    # a=[(matches[key].n, key.n) for key in list(matches.keys())]
     return jsonify(a)
 
     # swap the volunteers of two jobs, which should make the matching unstable
-    a, b = random.sample(jobs.keys(), 2)
-    jobs[b], jobs[a] = jobs[a], jobs[b]
+    a, b=random.sample(jobs.keys(), 2)
+    jobs[b], jobs[a]=jobs[a], jobs[b]
 
     match.is_stable(jobs, verbose=True)
