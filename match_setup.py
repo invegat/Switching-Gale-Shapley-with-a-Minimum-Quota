@@ -75,14 +75,20 @@ def setup(v_, j_):
         forbidden_v[j] = prefs[NA:]
 
     C = defaultdict(list)
-    jKeys = []
+    jKeys = set()
     loop = 0
-    while len(J) >= len(V):
+    while len(J) > 0:
+        print("V & J")
+        print(V)
+        print(J)
         match = Matcher(V, J, forbidden, forbidden_v)
 
         # match volunteers and jobs; returns a mapping of jobs to volunteers
         matches = match()
-        print(f'loop {loop} matches key {matches.keys()}')
+        assert match.is_stable(matches)           # should be a stable matching
+        print('stable match')
+
+        print(f'loop {loop} list(matches keys) {list(matches.keys())}')
         loop += 1
         if loop > 2:
             break
@@ -94,37 +100,48 @@ def setup(v_, j_):
             C[key[1]].append(key[0])
         print('Initial C.keys()', C.keys())
         print('Initial C.values()', C.values())
-        jKeys.extend(list(matches.keys()))
+        jKeys |= set(matches.keys())
 
-        print(f"len jKeys {len(jKeys)}  len(J) {len(J)} ")
-        J_ = copy.deepcopy(J)
+        print(
+            f"len jKeys {len(jKeys)}  len(J) {len(J)} jKeys {jKeys}  ")
+        J_ = copy.copy(J)
         J = {}
         for key, value in enumerate(J_.items()):
-            print(f'J.items() key {key}  value {value}')
-            if value[0] not in jKeys:
+            print(
+                f'J.items() key {key}  value[0] {value[0]}  type(value[0])  {type(value[0])} value[1] {value[1]}')
+            if value[0] in jKeys:
+                print(f'value {value[0]} in jKeys)')
+            else:
+                print(f'value {value[0]} NOT in jKeys)')
                 J[value[0]] = value[1]
-        print(f'let filtered J {len(J)}')
+        print(f'len filtered J {len(J)}  J {J}')
+        V_ = copy.copy(V)
+        for v, prefs in V_.items():
+            #print(f'k,v in V k {k}  v {v}')
+            prefs = [p for p in prefs if p in list(J.keys())]
+            print(f'new prefs {prefs}')
+            V[v] = prefs
+        # V = {k: v for k, v in mydict.items() if k.startswith('foo')}
 
         # J = dict((key, value) in enumerate(J.items()))
 
         # J = dict((key, value) in enumerate(J.items()) if key not in jKeys)
         # J = dict(filter(lamba j, v: j not in jKeys, enumerate(J))
-        assert match.is_stable(matches)           # should be a stable matching
-        print('stable match')
-    if len(J) > 0:
-        print("len(J) > 0")
-        V_ = sorted(C.items(), key=lambda kv: len(kv[1]))[:len(J)]
-        match = Matcher(V_, J, forbidden, forbidden_v)
+    # if len(J) > 0:
+    #     print("len(J) > 0")
+    #     V_ = sorted(C.items(), key=lambda kv: len(kv[1]))[:len(J)]
+    #     match = Matcher(V_, J, forbidden, forbidden_v)
 
-        # match volunteers and jobs; returns a mapping of jobs to volunteers
-        matches = match()
-        for key, value in enumerate(matches):
-            C[value].append(key)
+    #     # match volunteers and jobs; returns a mapping of jobs to volunteers
+    #     matches = match()
+    #     for key, value in enumerate(matches):
+    #         C[value].append(key)
 
     # print('jobs', jobs)
     print('C.keys()', C.keys())
     print([(key, value) for key, value in enumerate(C)])
-    a = [(key.n, [j.n for j in value]) for key, value in enumerate(C.items())]
+    a = [(value[0].n, [j.n for j in value[1]])
+         for key, value in enumerate(C.items())]
     # a = [(key.n, [j.n for j in C[key]]) for key in list(C.keys())]
 
     # a=[(matches[key].n, key.n) for key in list(matches.keys())]
