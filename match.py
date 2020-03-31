@@ -3,124 +3,119 @@ from collections import defaultdict
 
 class Matcher:
 
-    def __init__(self, volunteers, jobs, forbidden_jobs, forbidden_volunteers):
+    def __init__(self, men, women, forbidden):
         '''
         Constructs a Matcher instance.
 
-        Takes a dict of volunteers's job preferences, `volunteers`,
-        a dict of jobs's volunteer preferences, `jobs`,
-        and a dict specifying which jobs are forbidden_jobs
-        for each volunteer:
+        Takes a dict of men's spousal preferences, `men`,
+        a dict of women's spousal preferences, `women`,
+        and a dict specifying which marriages are forbidden
+        for each man:
 
-        >>> forbidden_jobs = { 'dan': ['ann', 'eve', ... ] }
+        >>> forbidden = { 'dan': ['ann', 'eve', ... ] }
 
         '''
-        self.V = volunteers
-        self.J = jobs
-        self.forbidden_jobs = forbidden_jobs
-        self.forbidden_volunteers = forbidden_volunteers
-        self.jobs = {}
+        self.M = men
+        self.W = women
+        self.forbidden = forbidden
+        self.wives = {}
         self.pairs = []
 
-        # we index volunteer/jobs preferences at initialization
+        # we index spousal preferences at initialization
         # to avoid expensive lookups when matching
-        # `vrank[v][j]` is volunteer's ranking of jobs
-        self.vrank = defaultdict(dict)
-        # `jrank[j][v]` is job's ranking of volunteers
-        self.jrank = defaultdict(dict)
+        self.mrank = defaultdict(dict)  # `mrank[m][w]` is m's ranking of w
+        self.wrank = defaultdict(dict)  # `wrank[w][m]` is w's ranking of m
 
-        for v, prefs in volunteers.items():
-            for i, j in enumerate(prefs):
-                self.vrank[v][j] = i
+        for m, prefs in men.items():
+            for i, w in enumerate(prefs):
+                self.mrank[m][w] = i
 
-        for j, prefs in jobs.items():
-            for i, v in enumerate(prefs):
-                self.jrank[j][v] = i
+        for w, prefs in women.items():
+            for i, m in enumerate(prefs):
+                self.wrank[w][m] = i
 
     def __call__(self):
         return self.match()
 
-    def prefers(self, j, v, h):
+    def prefers(self, w, m, h):
         '''
-        Test whether j prefers v over h.
+        Test whether w prefers m over h.
 
         '''
-        return self.jrank[j][v] < self.jrank[j][h]
+        return self.wrank[w][m] < self.wrank[w][h]
 
-    def is_forbidden(self, v, j):
+    def is_forbidden(self, m, w):
         '''
-        Test whether (v, j) is a forbidden pairing.
-
-        '''
-        return (j in self.forbidden_jobs.get(v, [])) or (v in self.forbidden_volunteers.get(j, []))
-
-    def after(self, v, j):
-        '''
-        Return the job favored by v after j.
+        Test whether (m, w) is a forbidden pairing.
 
         '''
-        prefs = self.V[v]               # v's ordered list of preferences
-        # index of jobs following job in list of prefs
-        i = self.vrank[v][j] + 1
+        return w in self.forbidden.get(m, [])
+
+    def after(self, m, w):
+        '''
+        Return the woman favored by m after w.
+
+        '''
+        prefs = self.M[m]               # m's ordered list of preferences
+        # index of woman following w in list of prefs
+        i = self.mrank[m][w] + 1
         if i >= len(prefs):
-            return ''                   # no more jobs left!
-        j = prefs[i]                    # job following j in list of prefs
-        if self.is_forbidden(v, j):     # if (v, j) is forbidden
-            return self.after(v, j)     # try next j
-        return j
+            return ''                   # no more women left!
+        w = prefs[i]                    # woman following w in list of prefs
+        if self.is_forbidden(m, w):     # if (m, w) is forbidden
+            return self.after(m, w)     # try next w
+        return w
 
-    def match(self, volunteers=None, next=None, jobs=None):
+    def match(self, men=None, next=None, wives=None):
         '''
-        Try to match all volunteers with their next preferred job.
+        Try to match all men with their next preferred spouse.
 
         '''
-        if volunteers is None:
-            volunteers = self.V.keys()         # get the complete list of volunteers
+        if men is None:
+            men = self.M.keys()         # get the complete list of men
         if next is None:
-            # if not defined, map each volunteer to their first preference
-            next = dict((v, rank[0]) for v, rank in self.V.items())
-        if jobs is None:
-            jobs = {}                  # mapping from jobs to current volunteer
-        if not len(volunteers):
-            self.pairs = [(h, j) for j, h in jobs.items()]
-            self.jobs = jobs
-            return jobs
-        lvol = list(volunteers)
-        v, volunteers = lvol[0], lvol[1:]
-        j = next[v]                     # next job for v to take
-        if not j:                       # continue if no job to take
-            return self.match(volunteers, next, jobs)
-        next[v] = self.after(v, j)      # job after j in v's list of prefs
-        if j in jobs:
-            h = jobs[j]                # current volunteer
-            if self.prefers(j, v, h):
-                # volunteer becomes available again
-                volunteers.append(h)
-                jobs[j] = v            # j becomes v's job
+            # if not defined, map each man to their first preference
+            next = dict((m, rank[0]) for m, rank in self.M.items())
+        if wives is None:
+            wives = {}                  # mapping from women to current spouse
+        if not len(men):
+            self.pairs = [(h, w) for w, h in wives.items()]
+            self.wives = wives
+            return wives
+        lmen = list(men)
+        m, men = lmen[0], lmen[1:]
+        w = next[m]                     # next woman for m to propose to
+        if not w:                       # continue if no woman to propose to
+            return self.match(men, next, wives)
+        next[m] = self.after(m, w)      # woman after w in m's list of prefs
+        if w in wives:
+            h = wives[w]                # current husband
+            if self.prefers(w, m, h):
+                men.append(h)           # husband becomes available again
+                wives[w] = m            # w becomes wife of m
             else:
-                volunteers.append(v)           # v remains without a job
+                men.append(m)           # m remains unmarried
         else:
-            jobs[j] = v                # j becomes job of v
-        return self.match(volunteers, next, jobs)
+            wives[w] = m                # w becomes wife of m
+        return self.match(men, next, wives)
 
-    def is_stable(self, jobs=None, verbose=False):
-        if jobs is None:
-            jobs = self.jobs
-        for j, v in jobs.items():
-            i = self.V[v].index(j)
-            preferred = self.V[v][:i]
+    def is_stable(self, wives=None, verbose=False):
+        if wives is None:
+            wives = self.wives
+        for w, m in wives.items():
+            i = self.M[m].index(w)
+            preferred = self.M[m][:i]
             for p in preferred:
-                # if p in self.forbidden_jobs.get(v, []):  # no need to worry about
-                if self.is_forbidden(v, p):
-                    continue                        # forbidden Volunteer/Jobs@
-                if p not in jobs:
+                if p in self.forbidden.get(m, []):  # no need to worry about
+                    continue                        # forbidden marriages@
+                if p not in wives:
                     continue
-                h = jobs[p]
-                if self.J[p].index(v) < self.J[p].index(h):
-                    msg = "{}'s volunteer to {} is unstable: " + \
+                h = wives[p]
+                if self.W[p].index(m) < self.W[p].index(h):
+                    msg = "{}'s marriage to {} is unstable: " + \
                           "{} prefers {} over {} and {} prefers " + \
-                          "{} over her current volunteer {}"
+                          "{} over her current husband {}"
                     if verbose:
-                        print(msg.format(v.n, j.n, v.n, p.n, j.n, p.n, v.n, h.n))
+                        print(msg.format(m, w, m, p, w, p, m, h))
                     return False
         return True

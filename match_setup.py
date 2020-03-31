@@ -1,4 +1,4 @@
-import random
+# import random
 from match import Matcher
 from person import Person
 from flask import jsonify
@@ -6,7 +6,7 @@ from collections import defaultdict
 import copy
 
 
-def setup(v_, j_):
+def setup(v_, j_, flipped):
     # the volunteers and their list of ordered job preferences
     # v_ = dict((m, prefs.split(', ')) for [m, prefs] in (
     #     line.rstrip().split(': ') for line in open('volunteers.short.txt')))
@@ -15,7 +15,7 @@ def setup(v_, j_):
     volunteers = list(v_.keys())
     jobs = list(j_.keys())
 
-    print('type v_["abe"]', type(v_['abe']), volunteers)
+    # print('type v_["abe"]', type(v_['abe']), volunteers)
     # remove any missing job names from volunteers
 
     for v in volunteers:
@@ -81,7 +81,7 @@ def setup(v_, j_):
         print("V & J")
         print(V)
         print(J)
-        match = Matcher(V, J, forbidden, forbidden_v)
+        match = Matcher(V, J, forbidden)  # , forbidden_v)
 
         # match volunteers and jobs; returns a mapping of jobs to volunteers
         matches = match()
@@ -90,8 +90,8 @@ def setup(v_, j_):
 
         print(f'loop {loop} list(matches keys) {list(matches.keys())}')
         loop += 1
-        if loop > 2:
-            break
+        # if loop > 2:
+        #     break
         # if len(C) == 0:
         #     C = dict((value, [key]) for key, value in enumerate(matches))
         #     print('Initial C.keys()', C.keys())
@@ -115,9 +115,11 @@ def setup(v_, j_):
                 print(f'value {value[0]} NOT in jKeys)')
                 J[value[0]] = value[1]
         print(f'len filtered J {len(J)}  J {J}')
+        if len(J) == 0:
+            break
         V_ = copy.copy(V)
         for v, prefs in V_.items():
-            #print(f'k,v in V k {k}  v {v}')
+            # print(f'k,v in V k {k}  v {v}')
             prefs = [p for p in prefs if p in list(J.keys())]
             print(f'new prefs {prefs}')
             V[v] = prefs
@@ -140,8 +142,12 @@ def setup(v_, j_):
     # print('jobs', jobs)
     print('C.keys()', C.keys())
     print([(key, value) for key, value in enumerate(C)])
-    a = [(value[0].n, [j.n for j in value[1]])
-         for key, value in enumerate(C.items())]
+    if flipped:
+        a = [([j.n for j in value[1]], value[0].n)
+             for key, value in enumerate(C.items())]
+    else:
+        a = [(value[0].n, [j.n for j in value[1]])
+             for key, value in enumerate(C.items())]
     # a = [(key.n, [j.n for j in C[key]]) for key in list(C.keys())]
 
     # a=[(matches[key].n, key.n) for key in list(matches.keys())]

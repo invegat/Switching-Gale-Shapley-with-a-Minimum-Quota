@@ -1,5 +1,6 @@
 from collections import namedtuple
 from random import choice
+import json
 
 from flask import Flask, jsonify, request
 import json
@@ -24,7 +25,11 @@ app = Flask(__name__)
 @app.route("/app/data", methods=["POST"])
 def get_volunteers():
     jdata = request.json
-    # print('jdata', json.loads(jdata)[0])
+    if type(jdata) == list:
+        # print('jdata is list')
+        jdata = json.dumps(jdata)
+        # print(type(jdata))
+    # print('jdata', jdata)
     js0 = json.loads(jdata)
     v_ = {}
     j_ = {}
@@ -46,7 +51,11 @@ def get_volunteers():
     # for j in jdata[1]:
     #     name, prefs = j.split(': ')
     #     j_[name] = prefs.split(', ')
-    return setup(v_, j_)
+    if len(j_) >= len(v_):
+        return setup(v_, j_, False)
+    else:
+        print('flipping')
+        return setup(j_, v_, True)
     # return jsonify(v_)
 
 
