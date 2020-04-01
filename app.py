@@ -1,9 +1,8 @@
 from collections import namedtuple
 from random import choice
 import json
-
+from flask_cors import CORS, cross_origin
 from flask import Flask, jsonify, request
-import json
 
 from match_setup import setup
 
@@ -20,6 +19,7 @@ quotes = [
 ]
 
 app = Flask(__name__)
+CORS(app)
 
 
 @app.route("/app/data", methods=["POST"])

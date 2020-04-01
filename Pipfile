@@ -12,6 +12,7 @@ autopep8 = "*"
 gf256 = "*"
 flask = "*"
 requests = "*"
+flask-cors = "*"
 
 [requires]
 python_version = "3.6"
