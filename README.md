@@ -23,7 +23,7 @@ We're also asked to perturb the resulting matching (swapping the volunteers of t
 jobs) and re-test for stability. The perturbed matching should be found to
 be unstable.
 
-*post a body like this:*
+**post a body like this:**
 [
     {
         "abe": [
@@ -290,7 +290,7 @@ be unstable.
         ]
     }
 ]
-*to get this response* 
+**to get this response** 
 [
     [
         "jon",
