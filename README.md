@@ -24,6 +24,7 @@ jobs) and re-test for stability. The perturbed matching should be found to
 be unstable.
 
 **post a body like this:**
+```
 [
     {
         "abe": [
@@ -289,9 +290,11 @@ be unstable.
             "3"
         ]
     }
-]
+]```
+
 **to get this response** 
-[
+
+```[
     [
         "jon",
         [
@@ -347,4 +350,4 @@ be unstable.
             "dee"
         ]
     ]
-]
+]```
