@@ -1,4 +1,4 @@
-This is a variant of the [Gale/Shapley algorithm](https://gist.github.com/joyrexus/9967709) in python designed to address the [Stable Marriage Problem](http://en.wikipedia.org/wiki/Stable_marriage_problem). The variant here is that **certain volunteer/job assignments are forbidden** and **Volunteers can have more than one job.**   Hosted as a AWS Lambda microservice at https://o9ktamo0f2.execute-api.us-east-1.amazonaws.com/dev/app/data
+This is a variant of the [Gale/Shapley algorithm](https://gist.github.com/joyrexus/9967709) in python designed to address the [Stable Marriage Problem](http://en.wikipedia.org/wiki/Stable_marriage_problem). The variant here is that **certain volunteer/job assignments are forbidden**, **Volunteers can have more than one job**, and **every job gets a volunteer**.   Hosted as a AWS Lambda microservice at https://o9ktamo0f2.execute-api.us-east-1.amazonaws.com/dev/app/data
 
 ## Problem description
 
