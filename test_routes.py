@@ -23,7 +23,7 @@ def create_app():
         # print('Did I get here?')
         jd = json.dumps(newList)
         # print('dumps', json.dumps(newList))
-        #print('jd', jd)
+        # print('jd', jd)
         res = requests.post(url, json=jd)
         print('res.headers', res.headers)
         # print((res.request.body))

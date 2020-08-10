@@ -2,7 +2,9 @@
   "name": "quotes",
   "description": "",
   "version": "0.1.0",
-  "dependencies": {},
+  "dependencies": {
+    "lodash": "^4.17.19"
+  },
   "devDependencies": {
     "serverless-python-requirements": "^5.1.0",
     "serverless-wsgi": "^1.7.4"
